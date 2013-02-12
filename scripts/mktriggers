@@ -1,0 +1,33 @@
+#!/bin/bash
+
+if [ -z $1 ] 
+  then
+    echo
+    echo "Usage:  mktriggers [--drop] <directory>"
+    echo
+    echo "This will send a list of triggers to stdout based on the table names"
+    echo "in the sql files of that directory. You will probably want to insert"
+    echo "these into some setup.sql file."
+    echo
+    echo " --drop      Output the sql to drop the triggers"
+    echo
+    echo "Examples:"
+    echo "  ./mktriggers --drop ../lib/sql/sqlite/1/"
+    echo "  ./mktriggers ../lib/sql/sqlite/1/"
+    echo
+    exit
+  fi
+
+
+
+if [ $1 = "--drop" ]
+  then
+    sql_files=`find $2 -type f -name "*.sql"`
+    sql="sed -n 's/CREATE TABLE \([^ (]*\).*/DROP TRIGGER \1_trigger;/pI' < $sql_files"
+  else
+    sql_files=`find $1 -type f -name "*.sql"`
+    sql="sed -n 's/CREATE TABLE \([^ (]*\).*/CREATE TRIGGER \1_trigger BEFORE UPDATE ON \1 FOR EACH ROW SET NEW.mod_ts=NOW();/pI' < $sql_files"
+  fi
+
+
+eval $sql
