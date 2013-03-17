@@ -12,14 +12,12 @@ class SchemaResponse extends Response
 
   private $version;
   private $sql;
-  private $create;
 
   public function __construct()
   {
     $this->version = 0;
     $this->sql = Array();
     $conf = new Config();
-    $this->create = json_decode($conf->getCreate());
   }
 
   /**
